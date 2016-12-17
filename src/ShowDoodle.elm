@@ -101,7 +101,7 @@ view ({ title, options, choices, newChoices } as doodle) =
             tr [] (List.append (nameInput :: currentChoicesSelector) [ saveChoice ])
 
         countLine =
-            tr [] ((td [] []) :: (countPerChoice doodle |> List.map (\c -> td [] [text (toString c)])))
+            tr [] ((td [] []) :: (countPerChoice doodle |> List.map (\c -> td [] [ text (toString c) ])))
 
         choicesTable : List (Html Msg) -> Html Msg
         choicesTable content =
@@ -119,14 +119,30 @@ view ({ title, options, choices, newChoices } as doodle) =
     in
         div [] [ backButton, titleh, choicesTable (doodle.choices |> List.map choiceLine) ]
 
+
 countPerChoice : Doodle -> List Int
-countPerChoice {newChoices, choices} =
+countPerChoice { newChoices, choices } =
     let
         toCount : PeopleChoices -> List Int
-        toCount ch = ch.choices |> List.map (\b -> if b then 1 else 0)
+        toCount ch =
+            ch.choices
+                |> List.map
+                    (\b ->
+                        if b then
+                            1
+                        else
+                            0
+                    )
 
-        addTuple tuple = let (a,b) = tuple in a + b
-        addList l1 l2 = (List.zip l1 l2) |> List.map addTuple
+        addTuple tuple =
+            let
+                ( a, b ) =
+                    tuple
+            in
+                a + b
+
+        addList l1 l2 =
+            (List.zip l1 l2) |> List.map addTuple
     in
         List.foldl addList (toCount newChoices) (choices |> List.map toCount)
 
