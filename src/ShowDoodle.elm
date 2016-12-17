@@ -4,8 +4,9 @@ import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Doodle exposing (Doodle, PeopleChoices)
-import Array exposing (Array)
 import Debug exposing (log)
+import List.Extra as List
+import ListUtils as List
 
 
 type Msg
@@ -29,7 +30,7 @@ update msg ({ id, title, options, choices, newChoices } as model) =
         DoneChoices ->
             let
                 cs =
-                    Array.push newChoices choices
+                    List.append choices [ newChoices ]
 
                 emptyChoices =
                     defaultChoice model
@@ -52,7 +53,7 @@ toggleChoice id ({ newChoices } as doodle) =
     let
         new =
             newChoices.choices
-                |> Array.indexedMap
+                |> List.indexedMap
                     (\i c ->
                         if i == id then
                             not c
@@ -65,7 +66,7 @@ toggleChoice id ({ newChoices } as doodle) =
 
 defaultChoice : Doodle -> PeopleChoices
 defaultChoice doodle =
-    PeopleChoices "" (Array.repeat (Array.length doodle.options) False)
+    PeopleChoices "" (List.repeat (List.length doodle.options) False)
 
 
 view : Doodle -> Html Msg
@@ -81,8 +82,7 @@ view ({ title, options, choices, newChoices } as doodle) =
             tr []
                 ((th [] [ text "Name" ])
                     :: (options
-                            |> Array.map (\opt -> th [] [ text opt ])
-                            |> Array.toList
+                            |> List.map (\opt -> th [] [ text opt ])
                        )
                 )
 
@@ -91,9 +91,8 @@ view ({ title, options, choices, newChoices } as doodle) =
 
         currentChoicesSelector =
             newChoices.choices
-                |> Array.indexedMap
+                |> List.indexedMap
                     (\i c -> td [] [ input [ type_ "checkbox", onClick (ToggleChoice i), checked c, disabled False ] [] ])
-                |> Array.toList
 
         saveChoice =
             td [] [ button [ onClick DoneChoices ] [ text "Done" ] ]
@@ -110,13 +109,12 @@ view ({ title, options, choices, newChoices } as doodle) =
             tr []
                 ((td [] [ text name ])
                     :: (choices
-                            |> Array.map
+                            |> List.map
                                 (\c -> td [] [ input [ type_ "checkbox", checked c, disabled True ] [] ])
-                            |> Array.toList
                        )
                 )
     in
-        div [] [ backButton, titleh, choicesTable (doodle.choices |> Array.map choiceLine |> Array.toList) ]
+        div [] [ backButton, titleh, choicesTable (doodle.choices |> List.map choiceLine) ]
 
 
 checkbox : Bool -> Bool -> msg -> Html msg

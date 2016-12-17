@@ -1,7 +1,8 @@
 module EditDoodle exposing (..)
 
 import Doodle exposing (..)
-import Array exposing (Array)
+import List.Extra as List
+import ListUtils as List
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
@@ -28,7 +29,7 @@ type alias EditDoodle =
 
 defaultChoice : Doodle -> PeopleChoices
 defaultChoice doodle =
-    PeopleChoices "" (Array.repeat (Array.length doodle.options) False)
+    PeopleChoices "" (List.repeat (List.length doodle.options) False)
 
 
 update : Msg -> EditDoodle -> ( EditDoodle, Cmd Msg, Res )
@@ -46,20 +47,20 @@ update msg ({ id, title, options, choices, newChoices } as model) =
         UpdateOption id value ->
             let
                 newOptions =
-                    Array.set id value options
+                    List.set id value options
             in
                 { model | options = newOptions } ! []
 
         AddOption ->
-            { model | options = Array.push "" options } ! []
+            { model | options = List.append options [ "" ] } ! []
 
         DeleteOption id ->
             let
                 newOptions =
-                    if Array.length options == 1 then
+                    if List.length options == 1 then
                         options
                     else
-                        Array.append (Array.slice 0 id options) (Array.slice (id + 1) (Array.length options) options)
+                        List.removeAt id options
             in
                 { model | options = newOptions } ! []
 
@@ -79,13 +80,13 @@ view ({ id, title, options, choices, newChoices } as doodle) =
         optionEntry id name =
             div []
                 [ span []
-                    [ input [ placeholder ("Option " ++ toString (id + 1)), onInput (UpdateOption id), value (Array.get id options |> Maybe.withDefault "") ] []
+                    [ input [ placeholder ("Option " ++ toString (id + 1)), onInput (UpdateOption id), value (List.getAt id options |> Maybe.withDefault "") ] []
                     , button [ onClick (DeleteOption id) ] [ text "Delete" ]
                     ]
                 ]
 
         optionsList =
-            options |> Array.toList |> List.indexedMap optionEntry
+            options |> List.indexedMap optionEntry
 
         saveButton =
             div [] [ button [ onClick SaveButton ] [ text "Save" ] ]

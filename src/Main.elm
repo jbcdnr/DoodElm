@@ -3,7 +3,8 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
-import Array exposing (Array)
+import List.Extra as List
+import ListUtils as List
 import Navigation exposing (Location)
 import Model exposing (..)
 import EditDoodle exposing (EditDoodle)
@@ -77,7 +78,7 @@ update msg model =
                                 }
 
                             newDoodleList =
-                                Array.push d model.doodles
+                                List.append model.doodles [ d ]
                         in
                             { model
                                 | doodles = newDoodleList
@@ -100,7 +101,7 @@ update msg model =
                                 let
                                     updatedDoodles =
                                         model.doodles
-                                            |> Array.indexedMap
+                                            |> List.indexedMap
                                                 (\i d ->
                                                     if d.id == doodle.id then
                                                         doodle
@@ -131,14 +132,14 @@ currentShowDoodle { current, doodles } =
             Nothing
 
 
-findDoodleWithId : Int -> Array Doodle -> Maybe Doodle
+findDoodleWithId : Int -> List Doodle -> Maybe Doodle
 findDoodleWithId id doodles =
-    doodles |> Array.filter (\d -> d.id == id) |> Array.get 0
+    doodles |> List.filter (\d -> d.id == id) |> List.getAt 0
 
 
-nextDoodleId : Array Doodle -> Int
+nextDoodleId : List Doodle -> Int
 nextDoodleId doodles =
-    (doodles |> Array.map .id |> Array.toList |> List.maximum |> Maybe.withDefault 0) + 1
+    (doodles |> List.map .id |> List.maximum |> Maybe.withDefault 0) + 1
 
 
 
@@ -167,14 +168,14 @@ view model =
             EditDoodle.view model.editDoodle |> Html.map ToEditDoodle
 
 
-viewListDoodles : Array Doodle -> Html Msg
+viewListDoodles : List Doodle -> Html Msg
 viewListDoodles doodles =
     let
         listEntry doodle =
             div [] [ a [ href ("#doodles/" ++ toString doodle.id) ] [ text doodle.title ] ]
 
         list =
-            doodles |> Array.toList |> List.map listEntry
+            doodles |> List.map listEntry
 
         addButton =
             button [ onClick CreateDoodle ] [ text "New" ]

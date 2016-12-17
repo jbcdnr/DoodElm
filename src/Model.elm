@@ -1,14 +1,15 @@
 module Model exposing (..)
 
-import Array exposing (Array)
 import Routing
 import EditDoodle
 import Doodle exposing (..)
+import List.Extra as List
+import ListUtils as List
 
 
 type alias Model =
     { current : Routing.Route
-    , doodles : Array Doodle
+    , doodles : List Doodle
     , editDoodle : EditDoodle.EditDoodle
     }
 
@@ -16,7 +17,7 @@ type alias Model =
 initialModel : Routing.Route -> Model
 initialModel route =
     { current = route
-    , doodles = Array.fromList [ d1 ]
+    , doodles = [ d1 ]
     , editDoodle = emptyDoodle
     }
 
@@ -24,11 +25,9 @@ initialModel route =
 d1 =
     Doodle 1
         "Menu"
-        (Array.fromList [ "Vegetarian", "Meat", "Fish", "Vegan", "Other" ])
-        ([ PeopleChoices "JB" (Array.fromList [ False, True, False, False, False ])
-         , PeopleChoices "Alexis" (Array.fromList [ True, False, False, False, False ])
-         , PeopleChoices "Prisca" (Array.fromList [ False, False, False, False, True ])
-         ]
-            |> Array.fromList
-        )
-        (PeopleChoices "" (Array.repeat 5 False))
+        [ "Vegetarian", "Meat", "Fish", "Vegan", "Other" ]
+        [ PeopleChoices "JB" [ False, True, False, False, False ]
+        , PeopleChoices "Alexis" [ True, False, False, False, False ]
+        , PeopleChoices "Prisca" [ False, False, False, False, True ]
+        ]
+        (PeopleChoices "" (List.repeat 5 False))

@@ -1,19 +1,19 @@
 module Doodle exposing (..)
 
-import Array exposing (Array)
+import List.Extra as List
 
 
 type alias Doodle =
     { id : Int
     , title : String
-    , options : Array String
-    , choices : Array PeopleChoices
+    , options : List String
+    , choices : List PeopleChoices
     , newChoices : PeopleChoices
     }
 
 
 emptyDoodle =
-    Doodle 0 "" (Array.repeat 3 "") Array.empty (PeopleChoices "" Array.empty)
+    Doodle 0 "" (List.repeat 3 "") [] (PeopleChoices "" [])
 
 
 type alias PeopleChoices =
@@ -23,4 +23,4 @@ type alias PeopleChoices =
 
 
 type alias Choices =
-    Array Bool
+    List Bool
