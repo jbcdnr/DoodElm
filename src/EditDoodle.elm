@@ -1,11 +1,4 @@
-module EditDoodle
-    exposing
-        ( Msg
-        , EditDoodle
-        , update
-        , view
-        , Res(..)
-        )
+module EditDoodle exposing (..)
 
 import Doodle exposing (..)
 import Array exposing (Array)
@@ -33,14 +26,19 @@ type alias EditDoodle =
     Doodle
 
 
+defaultChoice : Doodle -> PeopleChoices
+defaultChoice doodle =
+    PeopleChoices "" (Array.repeat (Array.length doodle.options) False)
+
+
 update : Msg -> EditDoodle -> ( EditDoodle, Cmd Msg, Res )
 update msg ({ id, title, options, choices, newChoices } as model) =
     case msg of
         SaveButton ->
-            ( model, Cmd.none, Save model )
+            ( emptyDoodle, Cmd.none, Save { model | newChoices = (defaultChoice model) } )
 
         Quit ->
-            ( model, Cmd.none, Cancel )
+            ( emptyDoodle, Cmd.none, Cancel )
 
         UpdateTitle t ->
             { model | title = t } ! []

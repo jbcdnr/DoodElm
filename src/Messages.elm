@@ -3,14 +3,12 @@ module Messages exposing (..)
 import Navigation
 import Model exposing (..)
 import EditDoodle
+import ShowDoodle
 
 
 type Msg
-    = ShowDoodle Int
-    | ShowList
+    = ShowList
     | CreateDoodle
     | ToEditDoodle EditDoodle.Msg
-    | ToggleChoice Int
-    | DoneChoices
-    | UpdateName String
+    | ToShowDoodle ShowDoodle.Msg
     | OnLocationChange Navigation.Location

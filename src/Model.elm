@@ -16,6 +16,19 @@ type alias Model =
 initialModel : Routing.Route -> Model
 initialModel route =
     { current = route
-    , doodles = Array.empty
+    , doodles = Array.fromList [ d1 ]
     , editDoodle = emptyDoodle
     }
+
+
+d1 =
+    Doodle 1
+        "Menu"
+        (Array.fromList [ "Vegetarian", "Meat", "Fish", "Vegan", "Other" ])
+        ([ PeopleChoices "JB" (Array.fromList [ False, True, False, False, False ])
+         , PeopleChoices "Alexis" (Array.fromList [ True, False, False, False, False ])
+         , PeopleChoices "Prisca" (Array.fromList [ False, False, False, False, True ])
+         ]
+            |> Array.fromList
+        )
+        (PeopleChoices "" (Array.repeat 5 False))
