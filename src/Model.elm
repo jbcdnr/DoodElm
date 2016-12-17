@@ -1,32 +1,21 @@
-module Model exposing (CurrentPage(..), Doodle, emptyDoodle, PeopleChoices, Choices)
+module Model exposing (..)
 
 import Array exposing (Array)
+import Routing
+import EditDoodle
+import Doodle exposing (..)
 
 
-type CurrentPage
-    = ListDoodles
-    | Create
-    | Show Int
-
-
-type alias Doodle =
-    { id : Int
-    , title : String
-    , options : Array String
-    , choices : Array PeopleChoices
-    , newChoices : PeopleChoices
+type alias Model =
+    { current : Routing.Route
+    , doodles : Array Doodle
+    , editDoodle : EditDoodle.EditDoodle
     }
 
 
-emptyDoodle =
-    Doodle 0 "" (Array.repeat 3 "") Array.empty (PeopleChoices "" Array.empty)
-
-
-type alias PeopleChoices =
-    { name : String
-    , choices : Choices
+initialModel : Routing.Route -> Model
+initialModel route =
+    { current = route
+    , doodles = Array.empty
+    , editDoodle = emptyDoodle
     }
-
-
-type alias Choices =
-    Array Bool

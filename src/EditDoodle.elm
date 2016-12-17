@@ -7,7 +7,7 @@ module EditDoodle
         , Res(..)
         )
 
-import Model exposing (..)
+import Doodle exposing (..)
 import Array exposing (Array)
 import Html exposing (..)
 import Html.Events exposing (..)

@@ -4,14 +4,16 @@ import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Array exposing (Array)
-import Navigation
-import EditDoodle
+import Navigation exposing (Location)
 import Model exposing (..)
 import EditDoodle exposing (EditDoodle)
+import Routing exposing (Route(..))
+import Messages exposing (Msg(..))
+import Doodle exposing (..)
 
 
 main =
-    Navigation.program UrlChange
+    Navigation.program OnLocationChange
         { init = init
         , view = view
         , update = update
@@ -19,64 +21,35 @@ main =
         }
 
 
-
--- MODEL
-
-
-type alias Model =
-    { current : CurrentPage
-    , doodles : Array Doodle
-    , editDoodle : EditDoodle
-    }
-
-
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-    ( model
-    , Cmd.none
-    )
-
-
-model =
-    Model ListDoodles Array.empty emptyDoodle
+    let
+        currentRoute =
+            Routing.parseLocation location
+    in
+        ( initialModel currentRoute, Cmd.none )
 
 
 
 -- UPDATE
 
 
-type Msg
-    = SelectDoodle Int
-    | BackToList
-    | CreateDoodle
-    | ToEditDoodle EditDoodle.Msg
-    | ToggleChoice Int
-    | DoneChoices
-    | UpdateName String
-    | UrlChange Navigation.Location
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UrlChange location ->
-            ( model, Cmd.none )
+        OnLocationChange location ->
+            let
+                newRoute =
+                    Routing.parseLocation location
+            in
+                ( { model | current = newRoute }, Cmd.none )
 
         -- TODO
-        SelectDoodle id ->
-            let
-                doodle =
-                    findDoodleWithId id model.doodles
-            in
-                case doodle of
-                    Just d ->
-                        ( { model | current = Show d.id }, Cmd.none )
+        ShowDoodle id ->
+            ( model, Navigation.newUrl <| "#doodles/" ++ toString id )
 
-                    Nothing ->
-                        ( model, Cmd.none )
-
-        BackToList ->
-            ( { model | current = ListDoodles }, Cmd.none )
+        ShowList ->
+            ( model, Navigation.newUrl "#doodles" )
 
         CreateDoodle ->
             let
@@ -100,9 +73,8 @@ update msg model =
                     EditDoodle.Cancel ->
                         { model
                             | editDoodle = newEditDoodle
-                            , current = ListDoodles
                         }
-                            ! []
+                            ! [ Navigation.newUrl "#doodles/" ]
 
                     EditDoodle.Save doodle ->
                         let
@@ -112,19 +84,22 @@ update msg model =
                             { model
                                 | doodles = newDoodleList
                                 , editDoodle = newEditDoodle
-                                , current = ListDoodles
                             }
-                                ! []
+                                ! [ Navigation.newUrl "#doodles/" ]
 
         ToggleChoice choice ->
             case model.current of
-                Create ->
+                Routing.Create ->
                     ( model, Cmd.none )
 
-                ListDoodles ->
+                Routing.List ->
                     ( model, Cmd.none )
 
-                Show id ->
+                Routing.NotFound ->
+                    ( model, Cmd.none )
+
+                -- TODO
+                Routing.Show id ->
                     case (findDoodleWithId id model.doodles) of
                         Nothing ->
                             ( model, Cmd.none )
@@ -151,13 +126,17 @@ update msg model =
 
         DoneChoices ->
             case model.current of
-                Create ->
+                Routing.Create ->
                     ( model, Cmd.none )
 
-                ListDoodles ->
+                Routing.NotFound ->
                     ( model, Cmd.none )
 
-                Show doodleId ->
+                -- TODO
+                Routing.List ->
+                    ( model, Cmd.none )
+
+                Routing.Show doodleId ->
                     case (findDoodleWithId doodleId model.doodles) of
                         Nothing ->
                             ( model, Cmd.none )
@@ -180,13 +159,17 @@ update msg model =
 
         UpdateName name ->
             case model.current of
-                Create ->
+                Routing.Create ->
                     ( model, Cmd.none )
 
-                ListDoodles ->
+                Routing.NotFound ->
                     ( model, Cmd.none )
 
-                Show id ->
+                -- TODO
+                Routing.List ->
+                    ( model, Cmd.none )
+
+                Routing.Show id ->
                     let
                         newDoodles =
                             model.doodles
@@ -251,10 +234,13 @@ defaultChoice doodle =
 view : Model -> Html Msg
 view model =
     case model.current of
-        ListDoodles ->
+        Routing.NotFound ->
+            text "404 Not found"
+
+        Routing.List ->
             viewListDoodles model.doodles
 
-        Show id ->
+        Routing.Show id ->
             case (findDoodleWithId id model.doodles) of
                 Nothing ->
                     viewListDoodles model.doodles
@@ -262,7 +248,7 @@ view model =
                 Just doodle ->
                     viewDoodle doodle
 
-        Create ->
+        Routing.Create ->
             EditDoodle.view model.editDoodle |> Html.map ToEditDoodle
 
 
@@ -270,7 +256,7 @@ viewListDoodles : Array Doodle -> Html Msg
 viewListDoodles doodles =
     let
         listEntry doodle =
-            button [ onClick (SelectDoodle d.id) ] [ text d.title ]
+            button [ onClick (ShowDoodle doodle.id) ] [ text doodle.title ]
 
         list =
             doodles |> Array.toList |> List.map listEntry
@@ -285,7 +271,7 @@ viewDoodle : Doodle -> Html Msg
 viewDoodle doodle =
     let
         backButton =
-            button [ onClick BackToList ] [ text "Back" ]
+            button [ onClick ShowList ] [ text "Back" ]
 
         title =
             h1 [] [ text doodle.title ]
