@@ -17,7 +17,7 @@ type alias Model =
 initialModel : Routing.Route -> Model
 initialModel route =
     { current = route
-    , doodles = [ d1 ]
+    , doodles = [ d1, d2, d3 ]
     , editDoodle = emptyDoodle
     }
 
@@ -26,6 +26,28 @@ d1 =
     Doodle 1
         "Menu"
         [ "Vegetarian", "Meat", "Fish", "Vegan", "Other" ]
+        [ PeopleChoices "JB" [ False, True, False, False, False ]
+        , PeopleChoices "Alexis" [ True, False, False, False, False ]
+        , PeopleChoices "Prisca" [ False, False, False, False, True ]
+        ]
+        (PeopleChoices "" (List.repeat 5 False))
+
+
+d2 =
+    Doodle 10
+        "Sport"
+        [ "Volley", "Foot", "Tennis", "Yoga", "Fencing" ]
+        [ PeopleChoices "JB" [ False, True, False, False, False ]
+        , PeopleChoices "Alexis" [ True, False, False, False, False ]
+        , PeopleChoices "Prisca" [ False, False, False, False, True ]
+        ]
+        (PeopleChoices "" (List.repeat 5 False))
+
+
+d3 =
+    Doodle 100
+        "Holidays"
+        [ "Iceland", "Nepal", "USA", "Switzerland", "France" ]
         [ PeopleChoices "JB" [ False, True, False, False, False ]
         , PeopleChoices "Alexis" [ True, False, False, False, False ]
         , PeopleChoices "Prisca" [ False, False, False, False, True ]
