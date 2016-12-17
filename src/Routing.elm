@@ -17,7 +17,7 @@ matchers =
         [ map Create (s "new")
         , map Show (s "doodles" </> int)
         , map List (s "doodles")
-        , map List (s "")
+        , map List top
         ]
 
 
