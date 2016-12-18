@@ -3,11 +3,11 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
-import List.Extra as List
-import ListUtils as List
 import Navigation exposing (Location)
+import List.Extra as List exposing (getAt)
+import ListUtils as List
 import Model exposing (..)
-import EditDoodle exposing (EditDoodle)
+import EditDoodle
 import ShowDoodle
 import Routing exposing (Route(..))
 import Messages exposing (Msg(..))
@@ -50,41 +50,46 @@ update msg model =
             ( model, Navigation.newUrl "#doodles" )
 
         CreateDoodle ->
-            ( model, Navigation.newUrl "#new" )
+            ( { model | editingDoodle = Just emptyDoodle }, Navigation.newUrl "#new" )
 
         ToEditDoodle msg ->
-            let
-                ( newEditDoodle, cmd, res ) =
-                    EditDoodle.update msg model.editDoodle
-            in
-                case res of
-                    EditDoodle.NoOp ->
-                        { model
-                            | editDoodle = newEditDoodle
-                        }
-                            ! []
+            case model.editingDoodle of
+                Nothing ->
+                    model ! []
 
-                    EditDoodle.Cancel ->
-                        { model
-                            | editDoodle = newEditDoodle
-                        }
-                            ! [ Navigation.newUrl "#doodles/" ]
-
-                    EditDoodle.Save doodle ->
-                        let
-                            d =
-                                { doodle
-                                    | id = nextDoodleId model.doodles
+                Just d ->
+                    let
+                        ( newEditDoodle, cmd, res ) =
+                            EditDoodle.update msg d
+                    in
+                        case res of
+                            EditDoodle.NoOp ->
+                                { model
+                                    | editingDoodle = Just newEditDoodle
                                 }
+                                    ! []
 
-                            newDoodleList =
-                                List.append model.doodles [ d ]
-                        in
-                            { model
-                                | doodles = newDoodleList
-                                , editDoodle = newEditDoodle
-                            }
-                                ! [ Navigation.newUrl "#doodles/" ]
+                            EditDoodle.Cancel ->
+                                { model
+                                    | editingDoodle = Nothing
+                                }
+                                    ! [ Navigation.newUrl "#doodles/" ]
+
+                            EditDoodle.Save ->
+                                let
+                                    d =
+                                        { newEditDoodle
+                                            | id = nextDoodleId model.doodles
+                                        }
+
+                                    newDoodleList =
+                                        List.append model.doodles [ d ]
+                                in
+                                    { model
+                                        | doodles = newDoodleList
+                                        , editingDoodle = Nothing
+                                    }
+                                        ! [ Navigation.newUrl "#doodles/" ]
 
         ToShowDoodle msg ->
             case currentShowDoodle model of
@@ -114,7 +119,7 @@ update msg model =
                                     }
                                         ! []
 
-                            ShowDoodle.Quit doodle ->
+                            ShowDoodle.Quit ->
                                 model ! [ Navigation.newUrl "#doodles/" ]
 
 
@@ -156,7 +161,6 @@ view model =
             viewListDoodles model.doodles
 
         Routing.Show id ->
-            -- TODO
             case (findDoodleWithId id model.doodles) of
                 Nothing ->
                     viewListDoodles model.doodles
@@ -165,7 +169,12 @@ view model =
                     ShowDoodle.view doodle |> Html.map ToShowDoodle
 
         Routing.Create ->
-            EditDoodle.view model.editDoodle |> Html.map ToEditDoodle
+            case model.editingDoodle of
+                Nothing ->
+                    viewListDoodles model.doodles
+
+                Just d ->
+                    EditDoodle.view d |> Html.map ToEditDoodle
 
 
 viewListDoodles : List Doodle -> Html Msg

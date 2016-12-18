@@ -4,9 +4,7 @@ import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Doodle exposing (Doodle, PeopleChoices)
-import Debug exposing (log)
-import List.Extra as List
-import ListUtils as List
+import List.Extra as List exposing (zip)
 
 
 type Msg
@@ -18,7 +16,7 @@ type Msg
 
 type Res
     = NoOp
-    | Quit Doodle
+    | Quit
 
 
 update : Msg -> Doodle -> ( Doodle, Cmd Msg, Res )
@@ -45,7 +43,7 @@ update msg ({ id, title, options, choices, newChoices } as model) =
                 { model | newChoices = renamed } ! []
 
         QuitButton ->
-            ( Doodle.emptyDoodle, Cmd.none, Quit model )
+            ( Doodle.emptyDoodle, Cmd.none, Quit )
 
 
 toggleChoice : Int -> Doodle -> Doodle

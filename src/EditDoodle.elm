@@ -1,11 +1,11 @@
 module EditDoodle exposing (..)
 
-import Doodle exposing (..)
-import List.Extra as List
-import ListUtils as List
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
+import Doodle exposing (..)
+import List.Extra as List exposing (getAt, removeAt)
+import ListUtils as List exposing (set)
 
 
 type Msg
@@ -19,12 +19,8 @@ type Msg
 
 type Res
     = NoOp
-    | Save Doodle
+    | Save
     | Cancel
-
-
-type alias EditDoodle =
-    Doodle
 
 
 defaultChoice : Doodle -> PeopleChoices
@@ -32,11 +28,11 @@ defaultChoice doodle =
     PeopleChoices "" (List.repeat (List.length doodle.options) False)
 
 
-update : Msg -> EditDoodle -> ( EditDoodle, Cmd Msg, Res )
+update : Msg -> Doodle -> ( Doodle, Cmd Msg, Res )
 update msg ({ id, title, options, choices, newChoices } as model) =
     case msg of
         SaveButton ->
-            ( emptyDoodle, Cmd.none, Save { model | newChoices = (defaultChoice model) } )
+            ( { model | newChoices = (defaultChoice model) }, Cmd.none, Save )
 
         Quit ->
             ( emptyDoodle, Cmd.none, Cancel )
@@ -65,7 +61,7 @@ update msg ({ id, title, options, choices, newChoices } as model) =
                 { model | options = newOptions } ! []
 
 
-view : EditDoodle -> Html Msg
+view : Doodle -> Html Msg
 view ({ id, title, options, choices, newChoices } as doodle) =
     let
         cancelButton =
@@ -94,6 +90,6 @@ view ({ id, title, options, choices, newChoices } as doodle) =
         div [] (List.append (List.append [ cancelButton, title ] optionsList) [ addButton, saveButton ])
 
 
-(!) : EditDoodle -> List (Cmd Msg) -> ( EditDoodle, Cmd Msg, Res )
+(!) : Doodle -> List (Cmd Msg) -> ( Doodle, Cmd Msg, Res )
 (!) d cs =
     ( d, Cmd.batch cs, NoOp )

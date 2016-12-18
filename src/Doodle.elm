@@ -1,4 +1,4 @@
-module Doodle exposing (..)
+module Doodle exposing (Doodle, emptyDoodle, PeopleChoices, Choices)
 
 import List.Extra as List
 

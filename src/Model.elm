@@ -1,16 +1,14 @@
-module Model exposing (..)
+module Model exposing (Model, initialModel)
 
 import Routing
 import EditDoodle
 import Doodle exposing (..)
-import List.Extra as List
-import ListUtils as List
 
 
 type alias Model =
     { current : Routing.Route
     , doodles : List Doodle
-    , editDoodle : EditDoodle.EditDoodle
+    , editingDoodle : Maybe Doodle
     }
 
 
@@ -18,7 +16,7 @@ initialModel : Routing.Route -> Model
 initialModel route =
     { current = route
     , doodles = [ d1, d2, d3 ]
-    , editDoodle = emptyDoodle
+    , editingDoodle = Nothing
     }
 
 
