@@ -1,12 +1,12 @@
-module EditDoodle exposing (..)
+module EditDoodle exposing (Msg, Res(..), update, view)
 
-import Html exposing (..)
-import Html.Events exposing (..)
-import Html.Attributes exposing (..)
-import Doodle exposing (..)
+import Html exposing (Html, div, input, button, text, span)
+import Html.Events exposing (onClick, onInput)
+import Html.Attributes exposing (class, placeholder, type_, value)
+import Doodle exposing (Doodle, PeopleChoices, emptyDoodle)
 import List.Extra as List exposing (getAt, removeAt)
 import ListUtils as List exposing (set)
-import Checkbox
+import DesignRessources exposing (backArrow)
 
 
 type Msg
@@ -23,18 +23,14 @@ type Res
     | Save
     | Cancel
 
-
-defaultChoice : Doodle -> PeopleChoices
-defaultChoice doodle =
-    PeopleChoices "" (List.repeat (List.length doodle.options) False)
-
-
 update : Msg -> Doodle -> ( Doodle, Cmd Msg, Res )
 update msg ({ id, title, options, choices, newChoices } as model) =
     case msg of
         SaveButton ->
-            if title == "" then model ! [] else
-            ( { model | newChoices = (defaultChoice model) }, Cmd.none, Save )
+            if title == "" then
+                model ! []
+            else
+                ( { model | newChoices = (defaultChoice model) }, Cmd.none, Save )
 
         Quit ->
             ( emptyDoodle, Cmd.none, Cancel )
@@ -67,10 +63,10 @@ view : Doodle -> Html Msg
 view ({ id, title, options, choices, newChoices } as doodle) =
     let
         cancelButton =
-            Checkbox.backArrow [ onClick Quit ]
+            DesignRessources.backArrow [ onClick Quit ]
 
         title =
-            input [ placeholder "Title", onInput UpdateTitle, class "title-create"] []
+            input [ placeholder "Title", onInput UpdateTitle, class "title" ] []
 
         addButton =
             div [] [ button [ onClick AddOption ] [ text "Add option" ] ]
@@ -79,7 +75,7 @@ view ({ id, title, options, choices, newChoices } as doodle) =
             div [ class "edit-option" ]
                 [ span []
                     [ input [ type_ "text", placeholder ("Option " ++ toString (id + 1)), onInput (UpdateOption id), value (List.getAt id options |> Maybe.withDefault "") ] []
-                    , span [class "delete-cross"] [Checkbox.cross [ onClick (DeleteOption id) ]]
+                    , span [ class "delete-cross" ] [ DesignRessources.cross [ onClick (DeleteOption id) ] ]
                     ]
                 ]
 
@@ -89,11 +85,21 @@ view ({ id, title, options, choices, newChoices } as doodle) =
         saveButton =
             div [] [ button [ onClick SaveButton, class "button-primary" ] [ text "Save" ] ]
     in
-        div []
-            (List.append ((div [class "edit-title"] [ cancelButton, title ])
-            :: optionsList)
-            [ addButton
-            , saveButton ])
+        div [ Html.Attributes.id "edit-doodle"]
+            (List.append
+                ((div [ Html.Attributes.id "header" ] [ cancelButton, title ])
+                    :: optionsList
+                )
+                [ addButton
+                , saveButton
+                ]
+            )
+
+
+defaultChoice : Doodle -> PeopleChoices
+defaultChoice doodle =
+    PeopleChoices "" (List.repeat (List.length doodle.options) False)
+
 
 
 (!) : Doodle -> List (Cmd Msg) -> ( Doodle, Cmd Msg, Res )

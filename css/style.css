@@ -16,48 +16,45 @@ input:focus {
   border-bottom: 1px solid #1EAEDB;
 }
 
-tr:last-child td {
+#show-doodle tr:last-child td {
   border-bottom: none;
 }
 
-table #choice td:last-child {
+#show-doodle table #choice td:last-child {
   border-bottom: none;
 }
 
-table tr:last-child {
+#show-doodle table tr:last-child {
     font-weight: bold;
 }
 
-.delete-cross {
+#list-doodles table tr:first-child {
+  border-top: 1px solid #E1E1E1;
+}
+
+#edit-doodle .edit-option .delete-cross {
   display: inline-block;
   position: relative;
   top: .3em;
   margin-left: .5em;
 }
 
-.edit-option {
-
-}
-
-.title-create {
+#edit-doodle .title {
   font-size: 2em;
 }
 
-.show-title svg {
+#header svg {
   float: left;
   margin-right: .8em;
   position: relative;
+}
+
+#show-doodle #header svg {
   top: .8em;
 }
 
-.edit-title svg {
-  float: left;
-  margin-right: .8em;
-  position: relative;
+#edit-doodle #header svg {
   top: 1em;
 }
 
-.show-title h3 {
-  display: inline-block;
-}
 

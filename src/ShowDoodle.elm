@@ -1,11 +1,11 @@
 module ShowDoodle exposing (Msg, Res(..), update, view)
 
-import Html exposing (..)
-import Html.Events exposing (..)
-import Html.Attributes exposing (..)
-import Doodle exposing (Doodle, PeopleChoices)
+import Html exposing (Html, div, h3, text, tr, td, th, input, button, table)
+import Html.Events exposing (onClick, onInput)
+import Html.Attributes exposing (style, placeholder, id, class, disabled)
 import List.Extra as List exposing (zip)
-import Checkbox
+import Doodle exposing (Doodle, PeopleChoices)
+import DesignRessources exposing (checkbox)
 
 
 type Msg
@@ -75,7 +75,7 @@ view : Doodle -> Html Msg
 view ({ title, options, choices, newChoices } as doodle) =
     let
         backButton =
-            Checkbox.backArrow [ onClick QuitButton ]
+            DesignRessources.backArrow [ onClick QuitButton ]
 
         titleh =
             h3 [] [ text title ]
@@ -94,7 +94,7 @@ view ({ title, options, choices, newChoices } as doodle) =
         currentChoicesSelector =
             newChoices.choices
                 |> List.indexedMap
-                    (\i checked -> td [ style [ ( "text-align", "center" ) ] ] [ Checkbox.checkbox checked (Just (ToggleChoice i)) ])
+                    (\i checked -> td [ style [ ( "text-align", "center" ) ] ] [ checkbox checked (Just (ToggleChoice i)) ])
 
         saveChoice =
             td []
@@ -125,11 +125,11 @@ view ({ title, options, choices, newChoices } as doodle) =
                 ((td [] [ text name ])
                     :: (choices
                             |> List.map
-                                (\checked -> td [ style [ ( "text-align", "center" ) ] ] [ Checkbox.checkbox checked Nothing ])
+                                (\checked -> td [ style [ ( "text-align", "center" ) ] ] [ checkbox checked Nothing ])
                        )
                 )
     in
-        div [] [ div [ class "show-title" ] [ backButton, titleh ], choicesTable (doodle.choices |> List.map choiceLine) ]
+        div [ id "show-doodle" ] [ div [ id "header" ] [ backButton, titleh ], choicesTable (doodle.choices |> List.map choiceLine) ]
 
 
 countPerChoice : Doodle -> List Int
