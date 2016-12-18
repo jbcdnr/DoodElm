@@ -153,28 +153,40 @@ nextDoodleId doodles =
 
 view : Model -> Html Msg
 view model =
-    case model.current of
-        Routing.NotFound ->
-            text "404 Not found"
+    let
+        container content =
+            div [ class "container" ]
+                [ div [ class "twelve columns" ]
+                    [ h1 [] [ text "DoodElm" ]
+                    , content
+                    ]
+                ]
 
-        Routing.List ->
-            viewListDoodles model.doodles
+        content =
+            case model.current of
+                Routing.NotFound ->
+                    text "404 Not found"
 
-        Routing.Show id ->
-            case (findDoodleWithId id model.doodles) of
-                Nothing ->
+                Routing.List ->
                     viewListDoodles model.doodles
 
-                Just doodle ->
-                    ShowDoodle.view doodle |> Html.map ToShowDoodle
+                Routing.Show id ->
+                    case (findDoodleWithId id model.doodles) of
+                        Nothing ->
+                            viewListDoodles model.doodles
 
-        Routing.Create ->
-            case model.editingDoodle of
-                Nothing ->
-                    viewListDoodles model.doodles
+                        Just doodle ->
+                            ShowDoodle.view doodle |> Html.map ToShowDoodle
 
-                Just d ->
-                    EditDoodle.view d |> Html.map ToEditDoodle
+                Routing.Create ->
+                    case model.editingDoodle of
+                        Nothing ->
+                            viewListDoodles model.doodles
+
+                        Just d ->
+                            EditDoodle.view d |> Html.map ToEditDoodle
+    in
+        container content
 
 
 viewListDoodles : List Doodle -> Html Msg

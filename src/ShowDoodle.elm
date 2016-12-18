@@ -74,7 +74,7 @@ view ({ title, options, choices, newChoices } as doodle) =
             button [ onClick QuitButton ] [ text "Back" ]
 
         titleh =
-            h1 [] [ text title ]
+            h3 [] [ text title ]
 
         headerLine =
             tr []
