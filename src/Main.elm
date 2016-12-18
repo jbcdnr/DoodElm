@@ -193,12 +193,12 @@ viewListDoodles : List Doodle -> Html Msg
 viewListDoodles doodles =
     let
         listEntry doodle =
-            div [] [ a [ href ("#doodles/" ++ toString doodle.id) ] [ text doodle.title ] ]
+            tr [] [ td [] [a [ href ("#doodles/" ++ toString doodle.id) ] [ text doodle.title ] ]]
 
         list =
-            doodles |> List.map listEntry
+            table [] (doodles |> List.map listEntry)
 
         addButton =
-            button [ onClick CreateDoodle ] [ text "New" ]
+            button [ onClick CreateDoodle ] [ text "Create" ]
     in
-        div [] (List.append list [ addButton ])
+        div [] [list, addButton ]

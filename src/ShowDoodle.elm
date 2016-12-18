@@ -75,7 +75,7 @@ view : Doodle -> Html Msg
 view ({ title, options, choices, newChoices } as doodle) =
     let
         backButton =
-            button [ onClick QuitButton ] [ text "Back" ]
+            Checkbox.backArrow [ onClick QuitButton ]
 
         titleh =
             h3 [] [ text title ]
@@ -129,7 +129,7 @@ view ({ title, options, choices, newChoices } as doodle) =
                        )
                 )
     in
-        div [] [ div [ class "title" ] [ backButton, titleh ], choicesTable (doodle.choices |> List.map choiceLine) ]
+        div [] [ div [ class "show-title" ] [ backButton, titleh ], choicesTable (doodle.choices |> List.map choiceLine) ]
 
 
 countPerChoice : Doodle -> List Int
@@ -157,11 +157,6 @@ countPerChoice { newChoices, choices } =
             (List.zip l1 l2) |> List.map addTuple
     in
         List.foldl addList (toCount newChoices) (choices |> List.map toCount)
-
-
-checkbox : Bool -> Bool -> msg -> Html msg
-checkbox ch dis msg =
-    input [ type_ "checkbox", onClick msg, checked ch, disabled dis ] []
 
 
 (!) : Doodle -> List (Cmd Msg) -> ( Doodle, Cmd Msg, Res )

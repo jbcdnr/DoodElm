@@ -33,6 +33,7 @@ update : Msg -> Doodle -> ( Doodle, Cmd Msg, Res )
 update msg ({ id, title, options, choices, newChoices } as model) =
     case msg of
         SaveButton ->
+            if title == "" then model ! [] else
             ( { model | newChoices = (defaultChoice model) }, Cmd.none, Save )
 
         Quit ->
@@ -66,19 +67,19 @@ view : Doodle -> Html Msg
 view ({ id, title, options, choices, newChoices } as doodle) =
     let
         cancelButton =
-            div [] [ button [ onClick Quit ] [ text "Cancel" ] ]
+            Checkbox.backArrow [ onClick Quit ]
 
         title =
-            div [] [ input [ placeholder "Title", onInput UpdateTitle ] [] ]
+            input [ placeholder "Title", onInput UpdateTitle, class "title-create"] []
 
         addButton =
-            div [] [ button [ onClick AddOption ] [ text "Add" ] ]
+            div [] [ button [ onClick AddOption ] [ text "Add option" ] ]
 
         optionEntry id name =
-            div []
+            div [ class "edit-option" ]
                 [ span []
                     [ input [ type_ "text", placeholder ("Option " ++ toString (id + 1)), onInput (UpdateOption id), value (List.getAt id options |> Maybe.withDefault "") ] []
-                    , Checkbox.cross [ onClick (DeleteOption id) ]
+                    , span [class "delete-cross"] [Checkbox.cross [ onClick (DeleteOption id) ]]
                     ]
                 ]
 
@@ -86,9 +87,13 @@ view ({ id, title, options, choices, newChoices } as doodle) =
             options |> List.indexedMap optionEntry
 
         saveButton =
-            div [] [ button [ onClick SaveButton ] [ text "Save" ] ]
+            div [] [ button [ onClick SaveButton, class "button-primary" ] [ text "Save" ] ]
     in
-        div [] (List.append ((span [] [ cancelButton, title ]) :: optionsList) [ addButton, saveButton ])
+        div []
+            (List.append ((div [class "edit-title"] [ cancelButton, title ])
+            :: optionsList)
+            [ addButton
+            , saveButton ])
 
 
 (!) : Doodle -> List (Cmd Msg) -> ( Doodle, Cmd Msg, Res )

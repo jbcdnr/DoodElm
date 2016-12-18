@@ -13,7 +13,7 @@ input:focus {
   border-left: none;
   border-right: none;
   border-top: none;
-  border-bottom: 1px solid #3498db;
+  border-bottom: 1px solid #1EAEDB;
 }
 
 tr:last-child td {
@@ -28,6 +28,36 @@ table tr:last-child {
     font-weight: bold;
 }
 
-input, h1, h2, button {
+.delete-cross {
+  display: inline-block;
+  position: relative;
+  top: .3em;
+  margin-left: .5em;
+}
+
+.edit-option {
+
+}
+
+.title-create {
+  font-size: 2em;
+}
+
+.show-title svg {
+  float: left;
+  margin-right: .8em;
+  position: relative;
+  top: .8em;
+}
+
+.edit-title svg {
+  float: left;
+  margin-right: .8em;
+  position: relative;
+  top: 1em;
+}
+
+.show-title h3 {
   display: inline-block;
 }
+
