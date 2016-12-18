@@ -32,6 +32,11 @@ input:focus {
   border-top: 1px solid #E1E1E1;
 }
 
+#list-doodles td {
+  font-size: 1.3em;
+  width: 300px;
+}
+
 #edit-doodle .edit-option .delete-cross {
   display: inline-block;
   position: relative;
