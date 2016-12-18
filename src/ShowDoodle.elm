@@ -5,6 +5,7 @@ import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Doodle exposing (Doodle, PeopleChoices)
 import List.Extra as List exposing (zip)
+import Checkbox
 
 
 type Msg
@@ -26,14 +27,17 @@ update msg ({ id, title, options, choices, newChoices } as model) =
             toggleChoice id model ! []
 
         DoneChoices ->
-            let
-                cs =
-                    List.append choices [ newChoices ]
+            if newChoices.name == "" then
+                model ! []
+            else
+                let
+                    cs =
+                        List.append choices [ newChoices ]
 
-                emptyChoices =
-                    defaultChoice model
-            in
-                { model | choices = cs, newChoices = emptyChoices } ! []
+                    emptyChoices =
+                        defaultChoice model
+                in
+                    { model | choices = cs, newChoices = emptyChoices } ! []
 
         UpdateName name ->
             let
@@ -80,7 +84,7 @@ view ({ title, options, choices, newChoices } as doodle) =
             tr []
                 ((th [] [ text "Name" ])
                     :: (options
-                            |> List.map (\opt -> th [] [ text opt ])
+                            |> List.map (\opt -> th [ style [ ( "text-align", "center" ) ] ] [ text opt ])
                        )
                 )
 
@@ -90,16 +94,26 @@ view ({ title, options, choices, newChoices } as doodle) =
         currentChoicesSelector =
             newChoices.choices
                 |> List.indexedMap
-                    (\i c -> td [] [ input [ type_ "checkbox", onClick (ToggleChoice i), checked c, disabled False ] [] ])
+                    (\i checked -> td [ style [ ( "text-align", "center" ) ] ] [ Checkbox.checkbox checked (Just (ToggleChoice i)) ])
 
         saveChoice =
-            td [] [ button [ onClick DoneChoices ] [ text "Done" ] ]
+            td []
+                [ button
+                    (List.append [ onClick DoneChoices, class "button-primary" ]
+                        (if newChoices.name == "" then
+                            [ disabled True ]
+                         else
+                            []
+                        )
+                    )
+                    [ text "Add" ]
+                ]
 
         bottomLine =
-            tr [] (List.append (nameInput :: currentChoicesSelector) [ saveChoice ])
+            tr [ id "choice" ] (List.append (nameInput :: currentChoicesSelector) [ saveChoice ])
 
         countLine =
-            tr [] ((td [] []) :: (countPerChoice doodle |> List.map (\c -> td [] [ text (toString c) ])))
+            tr [] ((td [] []) :: (countPerChoice doodle |> List.map (\c -> td [ style [ ( "text-align", "center" ) ] ] [ text (toString c) ])))
 
         choicesTable : List (Html Msg) -> Html Msg
         choicesTable content =
@@ -111,11 +125,11 @@ view ({ title, options, choices, newChoices } as doodle) =
                 ((td [] [ text name ])
                     :: (choices
                             |> List.map
-                                (\c -> td [] [ input [ type_ "checkbox", checked c, disabled True ] [] ])
+                                (\checked -> td [ style [ ( "text-align", "center" ) ] ] [ Checkbox.checkbox checked Nothing ])
                        )
                 )
     in
-        div [] [ backButton, titleh, choicesTable (doodle.choices |> List.map choiceLine) ]
+        div [] [ div [ class "title" ] [ backButton, titleh ], choicesTable (doodle.choices |> List.map choiceLine) ]
 
 
 countPerChoice : Doodle -> List Int

@@ -1,0 +1,33 @@
+
+input {
+  margin-top: .3em;
+  box-sizing: border-box;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  border-bottom-width: 1.5px;
+}
+
+input:focus {
+  outline: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  border-bottom: 1px solid #3498db;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+table #choice td:last-child {
+  border-bottom: none;
+}
+
+table tr:last-child {
+    font-weight: bold;
+}
+
+input, h1, h2, button {
+  display: inline-block;
+}

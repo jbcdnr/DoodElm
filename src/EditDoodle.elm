@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Doodle exposing (..)
 import List.Extra as List exposing (getAt, removeAt)
 import ListUtils as List exposing (set)
+import Checkbox
 
 
 type Msg
@@ -76,8 +77,8 @@ view ({ id, title, options, choices, newChoices } as doodle) =
         optionEntry id name =
             div []
                 [ span []
-                    [ input [ placeholder ("Option " ++ toString (id + 1)), onInput (UpdateOption id), value (List.getAt id options |> Maybe.withDefault "") ] []
-                    , button [ onClick (DeleteOption id) ] [ text "Delete" ]
+                    [ input [ type_ "text", placeholder ("Option " ++ toString (id + 1)), onInput (UpdateOption id), value (List.getAt id options |> Maybe.withDefault "") ] []
+                    , Checkbox.cross [ onClick (DeleteOption id) ]
                     ]
                 ]
 
@@ -87,7 +88,7 @@ view ({ id, title, options, choices, newChoices } as doodle) =
         saveButton =
             div [] [ button [ onClick SaveButton ] [ text "Save" ] ]
     in
-        div [] (List.append (List.append [ cancelButton, title ] optionsList) [ addButton, saveButton ])
+        div [] (List.append ((span [] [ cancelButton, title ]) :: optionsList) [ addButton, saveButton ])
 
 
 (!) : Doodle -> List (Cmd Msg) -> ( Doodle, Cmd Msg, Res )
