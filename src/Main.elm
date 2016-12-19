@@ -43,11 +43,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OnFetchAll (Err error) ->
-            let
-                _ =
-                    Debug.log (toString error)
-            in
-                ( model, Cmd.none )
+            ( model, Cmd.none )
 
         OnFetchAll (Ok newDoodlesRaw) ->
             let
@@ -55,6 +51,13 @@ update msg model =
                     PostgresDB.digestEntryDoodles newDoodlesRaw
             in
                 ( { model | doodles = doodles }, Cmd.none )
+
+        OnSentNewDoodle res ->
+            let
+                _ =
+                    Debug.log (toString res)
+            in
+                ( model, fetchAll )
 
         OnLocationChange location ->
             let
@@ -105,20 +108,10 @@ update msg model =
                                     ! [ Navigation.newUrl "#doodles/" ]
 
                             Edit.Save ->
-                                let
-                                    d =
-                                        { newEditDoodle
-                                            | id = nextDoodleId model.doodles
-                                        }
-
-                                    newDoodleList =
-                                        List.append model.doodles [ d ]
-                                in
-                                    { model
-                                        | doodles = newDoodleList
-                                        , editCurrent = Nothing
-                                    }
-                                        ! [ Navigation.newUrl "#doodles/" ]
+                                { model
+                                    | editCurrent = Nothing
+                                }
+                                    ! [ create d, Navigation.newUrl "#doodles/" ]
 
         ToShowDoodle msg ->
             case ( model.showCurrentChoice, model.route ) of

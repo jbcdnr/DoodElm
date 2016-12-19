@@ -11,3 +11,16 @@ set index value ls =
 
         Nothing ->
             ls
+
+
+contains : (a -> Bool) -> List a -> Bool
+contains pred ls =
+    case ls of
+        head :: tail ->
+            if pred head then
+                True
+            else
+                contains pred tail
+
+        [] ->
+            False

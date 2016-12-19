@@ -1,14 +1,25 @@
 module Commands exposing (..)
 
 import Json.Decode exposing (field)
+import Json.Encode
 import Http
 import PostgresDB exposing (DoodleEntry)
 import Messages exposing (..)
 import Doodle exposing (..)
+import Debug
 
 
-resourceUrl =
-    "http://localhost:3000/doodles_with_choices"
+rootUrl =
+    "http://localhost:3000/"
+
+
+pathUrl : String -> String
+pathUrl p =
+    rootUrl ++ p
+
+
+
+-- DECODER
 
 
 doodlesDecoder : Json.Decode.Decoder (List DoodleEntry)
@@ -26,21 +37,53 @@ doodleEntryDecoder =
         (field "name" (Json.Decode.string))
 
 
+
+-- ENCODER
+
+
+doodleEncoder : Doodle -> Json.Encode.Value
+doodleEncoder ({ id, title, options } as doodle) =
+    let
+        optionsJSON =
+            options |> List.map Json.Encode.string |> Json.Encode.list
+
+        encodings =
+            [ ( "id", Json.Encode.int id )
+            , ( "title", Json.Encode.string title )
+            , ( "options", optionsJSON )
+            ]
+    in
+        encodings
+            |> Json.Encode.object
+
+
+
+-- COMMANDS
+
+
 fetchAll : Cmd Msg
 fetchAll =
-    Http.get resourceUrl doodlesDecoder
+    Http.get (pathUrl "doodles_with_choices") doodlesDecoder
         |> Http.send OnFetchAll
+
+
+create : Doodle -> Cmd Msg
+create doodle =
+    let
+        _ =
+            Debug.log "here"
+
+        body =
+            [ doodleEncoder doodle ] |> Json.Encode.list |> Http.jsonBody
+
+        req =
+            Http.post (pathUrl "doodles") body Json.Decode.string
+    in
+        Http.send OnSentNewDoodle req
 
 
 
 {--
-create : Doodle -> Cmd Msg
-create doodle =
-    doodleEncoder doodle
-        |> Utils.postJson doodleDecoder resourceUrl
-        -- TODO check UID
-        |>
-            Task.perform Fail CreateDone
 -- add choice
 create : Int -> ChoicesWithName -> Cmd Msg
 create doodleId choices =
