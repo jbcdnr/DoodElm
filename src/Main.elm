@@ -12,6 +12,9 @@ import Doodle.Show as Show
 import Routing exposing (Route(..))
 import Messages exposing (Msg(..))
 import Doodle exposing (..)
+import Commands exposing (..)
+import Debug
+import PostgresDB
 
 
 main =
@@ -29,7 +32,7 @@ init location =
         currentRoute =
             Routing.parseLocation location
     in
-        ( initialModel currentRoute, Cmd.none )
+        ( initialModel currentRoute, fetchAll )
 
 
 
@@ -39,6 +42,20 @@ init location =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        OnFetchAll (Err error) ->
+            let
+                _ =
+                    Debug.log (toString error)
+            in
+                ( model, Cmd.none )
+
+        OnFetchAll (Ok newDoodlesRaw) ->
+            let
+                doodles =
+                    PostgresDB.digestEntryDoodles newDoodlesRaw
+            in
+                ( { model | doodles = doodles }, Cmd.none )
+
         OnLocationChange location ->
             let
                 newRoute =

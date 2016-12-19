@@ -1,12 +1,15 @@
 module Messages exposing (..)
 
 import Navigation
+import Http
+import PostgresDB exposing (DoodleEntry)
 import Doodle.Edit
 import Doodle.Show
 
 
 type Msg
-    = ShowList
+    = OnFetchAll (Result Http.Error (List DoodleEntry))
+    | ShowList
     | ShowDoodle Int
     | CreateDoodle
     | ToEditDoodle Doodle.Edit.Msg
