@@ -6,7 +6,9 @@
     "source-directories": [
         ".",
         "src",
-        "src/Components"
+        "src/Components",
+        "src/Utils",
+        "src/Doodle"
     ],
     "exposed-modules": [],
     "dependencies": {

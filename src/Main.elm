@@ -4,11 +4,11 @@ import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Navigation exposing (Location)
-import List.Extra as List exposing (getAt)
+import List.Extra as List
 import ListUtils as List
-import Model exposing (..)
-import EditDoodle
-import ShowDoodle
+import Models exposing (..)
+import Doodle.Edit as Edit
+import Doodle.Show as Show
 import Routing exposing (Route(..))
 import Messages exposing (Msg(..))
 import Doodle exposing (..)
@@ -44,38 +44,50 @@ update msg model =
                 newRoute =
                     Routing.parseLocation location
             in
-                ( { model | current = newRoute }, Cmd.none )
+                ( { model | route = newRoute }, Cmd.none )
 
         ShowList ->
             ( model, Navigation.newUrl "#doodles" )
 
+        ShowDoodle id ->
+            case findDoodleWithId id model.doodles of
+                Nothing ->
+                    model ! []
+
+                Just doodle ->
+                    ( { model
+                        | showCurrentChoice = Just (ChoicesWithName "" (emptyChoicesFromDoodle doodle))
+                      }
+                    , Navigation.newUrl ("#doodles/" ++ (toString id))
+                    )
+
         CreateDoodle ->
-            ( { model | editingDoodle = Just emptyDoodle }, Navigation.newUrl "#new" )
+            ( { model | editCurrent = Just emptyDoodle }, Navigation.newUrl "#new" )
 
         ToEditDoodle msg ->
-            case model.editingDoodle of
+            case model.editCurrent of
                 Nothing ->
                     model ! []
 
                 Just d ->
                     let
                         ( newEditDoodle, cmd, res ) =
-                            EditDoodle.update msg d
+                            Edit.update msg d
                     in
                         case res of
-                            EditDoodle.NoOp ->
+                            Edit.NoOp ->
                                 { model
-                                    | editingDoodle = Just newEditDoodle
+                                    | editCurrent = Just newEditDoodle
                                 }
                                     ! []
 
-                            EditDoodle.Cancel ->
+                            Edit.Cancel ->
                                 { model
-                                    | editingDoodle = Nothing
+                                    | editCurrent = Nothing
                                 }
                                     ! [ Navigation.newUrl "#doodles/" ]
 
-                            EditDoodle.Save ->
+                            Edit.Save ->
                                 let
                                     d =
                                         { newEditDoodle
@@ -87,64 +99,40 @@ update msg model =
                                 in
                                     { model
                                         | doodles = newDoodleList
-                                        , editingDoodle = Nothing
+                                        , editCurrent = Nothing
                                     }
                                         ! [ Navigation.newUrl "#doodles/" ]
 
         ToShowDoodle msg ->
-            case currentShowDoodle model of
-                Nothing ->
-                    model ! []
-
-                Just d ->
+            case ( model.showCurrentChoice, model.route ) of
+                ( Just choices, Show id ) ->
                     let
-                        ( doodle, cmd, res ) =
-                            ShowDoodle.update msg d
+                        ( newChoices, cmd, res ) =
+                            Show.update msg choices
                     in
                         case res of
-                            ShowDoodle.NoOp ->
+                            Show.NoOp ->
+                                { model | showCurrentChoice = Just newChoices } ! [ cmd |> Cmd.map ToShowDoodle ]
+
+                            Show.SaveChoice choiceToAdd ->
                                 let
                                     updatedDoodles =
                                         model.doodles
-                                            |> List.indexedMap
-                                                (\i d ->
-                                                    if d.id == doodle.id then
-                                                        doodle
-                                                    else
-                                                        d
-                                                )
+                                            |> List.updateIf
+                                                (\d -> d.id == id)
+                                                (\d -> { d | choices = (List.append d.choices [ choiceToAdd ]) })
                                 in
                                     { model
-                                        | doodles = updatedDoodles
+                                        | showCurrentChoice = Just newChoices
+                                        , doodles = updatedDoodles
                                     }
-                                        ! []
+                                        ! [ cmd |> Cmd.map ToShowDoodle ]
 
-                            ShowDoodle.Quit ->
+                            Show.Quit ->
                                 model ! [ Navigation.newUrl "#doodles/" ]
 
-
-
--- UTILS
-
-
-currentShowDoodle : Model -> Maybe Doodle
-currentShowDoodle { current, doodles } =
-    case current of
-        Show id ->
-            findDoodleWithId id doodles
-
-        other ->
-            Nothing
-
-
-findDoodleWithId : Int -> List Doodle -> Maybe Doodle
-findDoodleWithId id doodles =
-    doodles |> List.filter (\d -> d.id == id) |> List.getAt 0
-
-
-nextDoodleId : List Doodle -> Int
-nextDoodleId doodles =
-    (doodles |> List.map .id |> List.maximum |> Maybe.withDefault 0) + 1
+                other ->
+                    model ! []
 
 
 
@@ -163,7 +151,7 @@ view model =
                 ]
 
         content =
-            case model.current of
+            case model.route of
                 Routing.NotFound ->
                     text "404 Not found"
 
@@ -171,20 +159,15 @@ view model =
                     viewListDoodles model.doodles
 
                 Routing.Show id ->
-                    case (findDoodleWithId id model.doodles) of
-                        Nothing ->
-                            viewListDoodles model.doodles
-
-                        Just doodle ->
-                            ShowDoodle.view doodle |> Html.map ToShowDoodle
+                    viewShowDoodlePage model id
 
                 Routing.Create ->
-                    case model.editingDoodle of
+                    case model.editCurrent of
                         Nothing ->
                             viewListDoodles model.doodles
 
                         Just d ->
-                            EditDoodle.view d |> Html.map ToEditDoodle
+                            Edit.view d |> Html.map ToEditDoodle
     in
         container content
 
@@ -193,7 +176,7 @@ viewListDoodles : List Doodle -> Html Msg
 viewListDoodles doodles =
     let
         listEntry doodle =
-            tr [] [ td [] [ a [ href ("#doodles/" ++ toString doodle.id) ] [ text doodle.title ] ] ]
+            tr [] [ td [] [ span [ class "link", onClick (ShowDoodle doodle.id) ] [ text doodle.title ] ] ]
 
         list =
             table [] (doodles |> List.map listEntry)
@@ -202,3 +185,13 @@ viewListDoodles doodles =
             button [ onClick CreateDoodle ] [ text "Create" ]
     in
         div [ id "list-doodles" ] [ list, addButton ]
+
+
+viewShowDoodlePage : Model -> Int -> Html Msg
+viewShowDoodlePage model id =
+    case ( findDoodleWithId id model.doodles, model.showCurrentChoice ) of
+        ( Just doodle, Just choices ) ->
+            Show.view doodle choices |> Html.map ToShowDoodle
+
+        other ->
+            viewListDoodles model.doodles

@@ -1,14 +1,14 @@
 module Messages exposing (..)
 
 import Navigation
-import Model exposing (..)
-import EditDoodle
-import ShowDoodle
+import Doodle.Edit
+import Doodle.Show
 
 
 type Msg
     = ShowList
+    | ShowDoodle Int
     | CreateDoodle
-    | ToEditDoodle EditDoodle.Msg
-    | ToShowDoodle ShowDoodle.Msg
+    | ToEditDoodle Doodle.Edit.Msg
+    | ToShowDoodle Doodle.Show.Msg
     | OnLocationChange Navigation.Location

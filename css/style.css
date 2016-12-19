@@ -62,4 +62,8 @@ input:focus {
   top: 1em;
 }
 
-
+.link {
+    color: #1EAEDB;
+    text-decoration: underline;
+    cursor: pointer;
+}

@@ -1,4 +1,4 @@
-module DesignRessources exposing (checkbox, cross, backArrow)
+module Graphics exposing (checkbox, cross, backArrow)
 
 import Svg exposing (line, circle, svg)
 import Svg.Attributes exposing (..)
