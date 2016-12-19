@@ -23,6 +23,7 @@ type Res
     | Save
     | Cancel
 
+
 update : Msg -> Doodle -> ( Doodle, Cmd Msg, Res )
 update msg ({ id, title, options, choices, newChoices } as model) =
     case msg of
@@ -85,7 +86,7 @@ view ({ id, title, options, choices, newChoices } as doodle) =
         saveButton =
             div [] [ button [ onClick SaveButton, class "button-primary" ] [ text "Save" ] ]
     in
-        div [ Html.Attributes.id "edit-doodle"]
+        div [ Html.Attributes.id "edit-doodle" ]
             (List.append
                 ((div [ Html.Attributes.id "header" ] [ cancelButton, title ])
                     :: optionsList
@@ -99,7 +100,6 @@ view ({ id, title, options, choices, newChoices } as doodle) =
 defaultChoice : Doodle -> PeopleChoices
 defaultChoice doodle =
     PeopleChoices "" (List.repeat (List.length doodle.options) False)
-
 
 
 (!) : Doodle -> List (Cmd Msg) -> ( Doodle, Cmd Msg, Res )

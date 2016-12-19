@@ -1,4 +1,4 @@
-module ListUtils exposing (set)
+module ListUtils exposing (set, exists)
 
 import List.Extra as List
 
@@ -11,3 +11,16 @@ set index value ls =
 
         Nothing ->
             ls
+
+
+exists : (a -> Bool) -> List a -> Bool
+exists predicate list =
+    case list of
+        head :: tail ->
+            if predicate head then
+                True
+            else
+                exists predicate tail
+
+        [] ->
+            False

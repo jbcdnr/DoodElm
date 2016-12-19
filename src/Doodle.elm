@@ -1,4 +1,4 @@
-module Doodle exposing (Doodle, emptyDoodle, PeopleChoices, Choices)
+module Doodle exposing (Doodle, emptyDoodle, PeopleChoices, Choices, RawDoodleChoice)
 
 import List.Extra as List
 
@@ -24,3 +24,12 @@ type alias PeopleChoices =
 
 type alias Choices =
     List Bool
+
+
+type alias RawDoodleChoice =
+    { id : Int
+    , title : String
+    , options : List String
+    , choices : List Bool
+    , name : String
+    }
