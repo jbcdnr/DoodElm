@@ -52,11 +52,7 @@ update msg model =
             in
                 ( { model | doodles = doodles }, Cmd.none )
 
-        OnSentNewDoodle res ->
-            let
-                _ =
-                    Debug.log (toString res)
-            in
+        OnSentNewDoodle id ->
                 ( model, fetchAll )
 
         OnLocationChange location ->

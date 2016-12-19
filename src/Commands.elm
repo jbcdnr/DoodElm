@@ -42,14 +42,13 @@ doodleEntryDecoder =
 
 
 doodleEncoder : Doodle -> Json.Encode.Value
-doodleEncoder ({ id, title, options } as doodle) =
+doodleEncoder ({ title, options } as doodle) =
     let
         optionsJSON =
             options |> List.map Json.Encode.string |> Json.Encode.list
 
         encodings =
-            [ ( "id", Json.Encode.int id )
-            , ( "title", Json.Encode.string title )
+            [ ( "title", Json.Encode.string title )
             , ( "options", optionsJSON )
             ]
     in
@@ -70,14 +69,14 @@ fetchAll =
 create : Doodle -> Cmd Msg
 create doodle =
     let
-        _ =
-            Debug.log "here"
-
         body =
             [ doodleEncoder doodle ] |> Json.Encode.list |> Http.jsonBody
 
+        idDecoder =
+            (Json.Decode.field "id" Json.Decode.int)
+
         req =
-            Http.post (pathUrl "doodles") body Json.Decode.string
+            Http.post (pathUrl "doodles") body idDecoder
     in
         Http.send OnSentNewDoodle req
 
