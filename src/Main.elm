@@ -196,7 +196,7 @@ viewListDoodles doodles =
             tr [] [ td [] [ span [ class "link", onClick (ShowDoodle doodle.id) ] [ text doodle.title ] ] ]
 
         list =
-            table [] (doodles |> List.map listEntry)
+            table [] (doodles |> List.sortBy .id |> List.map listEntry)
 
         addButton =
             button [ onClick CreateDoodle ] [ text "Create" ]
