@@ -10,8 +10,12 @@ provided through the [PostgREST](http://postgrest.com) API.
 
 Design was build on top of [skeleton](http://getskeleton.com).
 
-### Screenshot
+## Screenshot
+
+### Display a doodle
 
 ![Display a doodle screenshot](media/show.png)
+
+### Create a doodle
 
 ![Create a doodle screenshot](media/create.png)
