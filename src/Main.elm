@@ -104,10 +104,19 @@ update msg model =
                                     ! [ Navigation.newUrl "#doodles/" ]
 
                             Edit.Save ->
-                                { model
-                                    | editCurrent = Nothing
-                                }
-                                    ! [ create d, Navigation.newUrl "#doodles/" ]
+                                -- add doodle localy
+                                let
+                                    newDoodle =
+                                        { d | id = nextDoodleId model.doodles }
+
+                                    newDoodles =
+                                        model.doodles ++ [ newDoodle ]
+                                in
+                                    { model
+                                        | editCurrent = Nothing
+                                        , doodles = newDoodles
+                                    }
+                                        ! [ create d, Navigation.newUrl "#doodles/" ]
 
         ToShowDoodle msg ->
             case ( model.showCurrentChoice, model.route ) of
@@ -121,10 +130,18 @@ update msg model =
                                 { model | showCurrentChoice = Just newChoices } ! [ cmd |> Cmd.map ToShowDoodle ]
 
                             Show.SaveChoice choiceToAdd ->
-                                { model
-                                    | showCurrentChoice = Just newChoices
-                                }
-                                    ! [ addChoice id choiceToAdd ]
+                                let
+                                    newDoodles =
+                                        model.doodles
+                                            |> List.updateIf
+                                                (\d -> d.id == id)
+                                                (\d -> { d | choices = d.choices ++ [ choiceToAdd ] })
+                                in
+                                    { model
+                                        | showCurrentChoice = Just newChoices
+                                        , doodles = newDoodles
+                                    }
+                                        ! [ addChoice id choiceToAdd ]
 
                             Show.Quit ->
                                 model ! [ Navigation.newUrl "#doodles/" ]
