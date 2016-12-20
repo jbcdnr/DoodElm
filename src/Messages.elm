@@ -9,7 +9,7 @@ import Doodle.Show
 
 type Msg
     = OnFetchAll (Result Http.Error (List DoodleEntry))
-    | OnSentNewDoodle (Result Http.Error Int)
+    | ReloadDB (Result Http.Error Int)
     | ShowList
     | ShowDoodle Int
     | CreateDoodle

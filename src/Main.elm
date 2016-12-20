@@ -52,8 +52,8 @@ update msg model =
             in
                 ( { model | doodles = doodles }, Cmd.none )
 
-        OnSentNewDoodle id ->
-                ( model, fetchAll )
+        ReloadDB id ->
+            ( model, fetchAll )
 
         OnLocationChange location ->
             let
@@ -121,18 +121,10 @@ update msg model =
                                 { model | showCurrentChoice = Just newChoices } ! [ cmd |> Cmd.map ToShowDoodle ]
 
                             Show.SaveChoice choiceToAdd ->
-                                let
-                                    updatedDoodles =
-                                        model.doodles
-                                            |> List.updateIf
-                                                (\d -> d.id == id)
-                                                (\d -> { d | choices = (List.append d.choices [ choiceToAdd ]) })
-                                in
-                                    { model
-                                        | showCurrentChoice = Just newChoices
-                                        , doodles = updatedDoodles
-                                    }
-                                        ! [ cmd |> Cmd.map ToShowDoodle ]
+                                { model
+                                    | showCurrentChoice = Just newChoices
+                                }
+                                    ! [ addChoice id choiceToAdd ]
 
                             Show.Quit ->
                                 model ! [ Navigation.newUrl "#doodles/" ]

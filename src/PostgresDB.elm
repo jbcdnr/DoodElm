@@ -8,15 +8,15 @@ type alias DoodleEntry =
     { id : Int
     , title : String
     , options : List String
-    , choices : List Bool
-    , name : String
+    , choices : Maybe (List Bool)
+    , name : Maybe String
     }
 
 
 digestEntryDoodles : List DoodleEntry -> List Doodle
 digestEntryDoodles raws =
     raws
-        |> List.foldl
+        |> List.foldr
             (\raw doodles ->
                 let
                     { id, title, options, choices, name } =
@@ -25,17 +25,22 @@ digestEntryDoodles raws =
                     alreadyExisting =
                         doodles |> List.find (\d -> d.id == id)
 
-                    peopleChoices =
-                        ChoicesWithName name choices
+                    maybePeopleChoices =
+                        Maybe.map2 ChoicesWithName name choices
                 in
-                    case alreadyExisting of
+                    case maybePeopleChoices of
                         Nothing ->
-                            ({ id = id, title = title, options = options, choices = [ peopleChoices ] }) :: doodles
+                            ({ id = id, title = title, options = options, choices = [] }) :: doodles
 
-                        Just existing ->
-                            doodles
-                                |> List.updateIf
-                                    (\d -> d.id == id)
-                                    (\_ -> { existing | choices = (peopleChoices :: existing.choices) })
+                        Just peopleChoices ->
+                            case alreadyExisting of
+                                Nothing ->
+                                    ({ id = id, title = title, options = options, choices = [ peopleChoices ] }) :: doodles
+
+                                Just existing ->
+                                    doodles
+                                        |> List.updateIf
+                                            (\d -> d.id == id)
+                                            (\_ -> { existing | choices = (peopleChoices :: existing.choices) })
             )
             []
