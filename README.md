@@ -6,7 +6,8 @@ basic Doodle webapp.
 Run `elm-make src/Main.elm --output elm.js` and open `index.html`
 
 Data should be handled in a [Postgres database](https://www.postgresql.org) and
-provided through the [PostgREST](http://postgrest.com) API.
+provided through the [PostgREST](http://postgrest.com) API. You can find a
+sample of the database in `example/db.sql`.
 
 Design was build on top of [skeleton](http://getskeleton.com).
 
