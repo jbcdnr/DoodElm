@@ -1,7 +1,7 @@
 # DoodElm
 
 This is a toy project to explore the possibilities of Elm. It reproduces a
-basic Doodle webapp.
+basic Doodle webapp. You can find an offline demo [here](http://jbcordonnier.com/doodelm/).
 
 Run `elm-make src/Main.elm --output elm.js` and open `index.html`
 
